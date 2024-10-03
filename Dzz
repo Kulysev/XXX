@@ -1,0 +1,47 @@
+import numpy as np
+
+def least_cost_method(supply, demand, costs):
+    distribution = np.zeros((len(supply), len(demand)))
+    
+    i, j = 0, 0
+    
+    while i < len(supply) and j < len(demand):
+        allocated = min(supply[i], demand[j])
+        distribution[i][j] = allocated
+        
+        supply[i] -= allocated
+        demand[j] -= allocated
+        
+        if supply[i] == 0:
+            i += 1
+        if demand[j] == 0:
+            j += 1
+        
+        if supply[i] == 0:
+            i += 1
+            if i < len(supply):
+                j = np.argmin(costs[i][:])  
+        if demand[j] == 0:
+            j += 1
+            if j < len(demand):
+                i = np.argmin(costs[:, j])  
+
+    return distribution
+
+supply = [1000, 1500, 700]  # Омск, Томск, Пермь
+demand = [1200, 1000, 1000]  # ЕКБ, СПБ, МСК
+
+costs = np.array([
+    [500, 1000, 1000],  # Омск
+    [600, 1100, 1000],  # Томск
+    [400, 1000, 900]    # Пермь
+])
+
+result = least_cost_method(supply, demand, costs)
+
+print("Распределение товаров:")
+for row in result:
+    print(row)
+
+total_cost = np.sum(result * costs)
+print(f"Общая стоимость доставки: {total_cost}")
